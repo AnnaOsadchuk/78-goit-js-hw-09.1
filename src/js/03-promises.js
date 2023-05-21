@@ -4,16 +4,15 @@ const elForm = document.querySelector('.form');
 
 elForm.addEventListener('submit', onFormSubmit);
 
-function createPromise(i, formData) {
+function createPromise(position, delay) {
   const shouldResolve = Math.random() > 0.3;
-  const delay = Number(formData.firstDelay) + Number(formData.step * i);
 
   const promise = new Promise((resolve, reject) => {
     setTimeout(() => {
       if (shouldResolve) {
-        resolve(`Fulfilled promise ${i + 1} in ${delay} ms`);
+        resolve({ position, delay });
       } else {
-        reject(`Reject promise ${i + 1} in ${delay} ms`);
+        reject({ position, delay });
       }
     }, delay);
   });
@@ -37,8 +36,14 @@ function onFormSubmit(event) {
   };
 
   for (let i = 0; i < amount; i++) {
-    createPromise(i, formData)
-      .then(x => Notify.success(x))
-      .catch(x => Notify.failure(x));
+    const delay = Number(formData.firstDelay) + Number(formData.step * i);
+    createPromise(i + 1, delay)
+      .then(({ position, delay }) =>
+        Notify.success(`Fulfilled promise ${position} in ${delay} ms`)
+      )
+      .catch(({ position, delay }) =>
+        Notify.failure(`Reject promise ${position} in ${delay} ms`)
+      );
   }
+  elForm.reset();
 }
