@@ -16,7 +16,7 @@ const options = {
   enableTime: true,
   dateFormat: 'Y-m-d H:i',
   defaultDate: currentDate,
-  onChange(selectedDates) {
+  onClose(selectedDates) {
     targetDate = selectedDates[0];
     if (targetDate < currentDate) {
       const message = 'Please choose a date in the future';
@@ -32,22 +32,28 @@ buttonEl.addEventListener('click', startCounter);
 
 function startCounter() {
   if (targetDate > currentDate) {
-    setInterval(() => {
+    buttonEl.disabled = true;
+    const timerId = setInterval(() => {
       currentDate = new Date();
-
       const diff = convertMs(targetDate - currentDate);
-
-      setCounterFields(diff);
-      //   console.log(convert);
+      if (targetDate > currentDate) {
+        setCounterFields(diff);
+      } else {
+        clearInterval(timerId);
+      }
     }, 1000);
   }
 }
 
 function setCounterFields(diff) {
-  days.textContent = diff.days;
-  hours.textContent = diff.hours;
-  minutes.textContent = diff.minutes;
-  seconds.textContent = diff.seconds;
+  days.textContent = addLeadingZero(diff.days);
+  hours.textContent = addLeadingZero(diff.hours);
+  minutes.textContent = addLeadingZero(diff.minutes);
+  seconds.textContent = addLeadingZero(diff.seconds);
+}
+
+function addLeadingZero(value) {
+  return value.toString().padStart(2, '0');
 }
 
 function convertMs(ms) {
